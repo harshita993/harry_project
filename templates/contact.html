@@ -1,8 +1,46 @@
 {% extends "base.html" %}
-{% block title %}{% endblock title %}
+{% block title %}contact-us{% endblock title %}
 
 
 
 {% block content %}
+<div class = "container-fluid px-0 my-0">
+    <img src="/static/media/contactus.png" class = "d-block w-100" style = "height:350px; width:100%;">
+    <h1 style = "position:absolute; top:140px; color:white; left:210px;">Contact-Us</h1>
 
+<div class="container my-2" >
+    <div class="row">
+    </br>
+        <div class="col-md-6 d-flex flex-column justify-content-center" style="background-color:pink;">
+            <form class="row g-3" method="post" action="{% url 'contact' %}">
+                {% csrf_token %}
+            <div class="col-12">
+                <label for="firstname" class="form-label">First name</label>
+                <input type="text" class="form-control" placeholder="First name" aria-label="First name" name="firstname">
+              </div>
+              <div class="col">
+                <label for="phone" class="form-label">Phone No.</label>
+                <input type="text" class="form-control" placeholder="Phone no." aria-label="phoneno" name ="phone">
+              </div>
+            
+            <div class="col-12">
+                <label for="exampleInputEmail1" class="form-label">Email address</label>
+                <input type="email" class="form-control" name="email" id="exampleInputEmail1" aria-describedby="emailHelp">
+            </div>
+        
+            <div class="col-12">
+                <label for="desc" class="form-label" id = "desc">Tell me about what you want to contact me for</label>
+                <textarea class="form-control" id="desc" name="desc" rows="3"></textarea>
+            </div>
+        
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+      </form>
+    </div>
+      <div class="col-md-6 d-flex align-items-center justify-content-center" style = "width:100%;">
+        <img src="/static/media/contact-form.png" class="img-fluid rounded" style="max-width: 105%; height:500px;">
+
+    </div>
+</div>
 {% endblock content %}
