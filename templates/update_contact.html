@@ -6,17 +6,17 @@
 {% block content %}
 <div class = "container-fluid px-0 my-0">
     <img src="/static/media/contactus.png" class = "d-block w-100" style = "height:350px; width:100%;">
-    <h1 style = "position:absolute; top:140px; color:white; left:210px;">Contact-Us</h1>
+    <h1 style = "position:absolute; top:140px; color:white; left:210px;">Update Contact-Us</h1>
 
 <div class="container my-2" >
     <div class="row">
     </br>
         <div class="col-md-6 d-flex flex-column justify-content-center" style="background-color:pink;">
-            <form class="row g-3" method="post" action="{% url 'contact' %}">
+            <form class="row g-3" method="post">
                 {% csrf_token %}
             <div class="col-12">
                 <label for="firstname" class="form-label">First name</label>
-                <input type="text" class="form-control" placeholder="First name" aria-label="First name" name="name">
+                <input type="text" class="form-control" placeholder="First name" aria-label="First name" name="name" value="{{ contact.name }}">
               </div>
               <div class="col">
                 <label for="phone" class="form-label">Phone No.</label>
@@ -34,7 +34,7 @@
             </div>
         
         <div class="col-12">
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">Update</button>
           </div>
         </br>
         
@@ -45,39 +45,5 @@
 
     </div>
 </div>
-<div class="container mt-4">
-  <h2>Submitted Contacts</h2>
-  <table class="table table-bordered">
-      <thead>
-          <tr>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Message</th>
-              <th>Date</th>
-              <th>Actions</th>
-          </tr>
-      </thead>
-      <tbody>
-          {% for contact in contacts %}
-          <tr>
-              <td>{{ contact.name }}</td>
-              <td>{{ contact.phone }}</td>
-              <td>{{ contact.email }}</td>
-              <td>{{ contact.desc }}</td>
-              <td>{{ contact.date }}</td>
-              <td><a href="{% url 'update_contact' contact.id %}">update</a> |
-                  <a href="{% url 'delete_contact' contact.id %}" class="btn btn-danger btn-sm"
-                    onclick="return confirm('Are you sure you want to delete {{ contact.name }}?')">
-                Delete
-             </a>
-          </tr>
-          {% empty %}
-          <tr>
-              <td colspan="5" class="text-center">No contacts found</td>
-          </tr>
-          {% endfor %}
-      </tbody>
-  </table>
-</div>
+</div></div>
 {% endblock content %}
