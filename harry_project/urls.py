@@ -21,5 +21,10 @@ admin.site.site_title = "Harry Ice-Cream"
 admin.site.index_title = "Welcome to Harry Ice-Cream"
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',include('my_app.urls'))
-]
+    path('',include('my_app.urls')),
+    path('blog/', include('blog.urls')), 
+    ]
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
