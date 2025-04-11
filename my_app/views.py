@@ -1,10 +1,12 @@
-from django.shortcuts import render,HttpResponse,redirect
+from django.shortcuts import render,HttpResponse,redirect, get_object_or_404
 from datetime import datetime
-from my_app.models import Contact
+from my_app.models import Contact, Icecream
+from blog.models import BlogPost
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from .forms import IcecreamForm
 def register_view(request):
     if request.method == 'POST':
         username = request.POST.get("username")
@@ -39,17 +41,13 @@ def login_view(request):
             return redirect('login')
                  
     return render(request,'login.html')
-@login_required(login_url='login')
-def index(request):
 
-    variable = {
-        'instutue_name':"sutex bank"
-        
-    }
+def index(request):
+    icecreams = Icecream.objects.all()
     if request.user.is_authenticated:
         messages.success(request, f"Welcome, {request.user.username}!")
-    return render(request,"index.html",variable)
-@login_required(login_url='login')
+    return render(request,"index.html",{'icecreams': icecreams})
+
 def contact(request):
     if request.method == "POST":
         firstname = request.POST.get("name")
@@ -67,13 +65,13 @@ def contact(request):
     contacts = Contact.objects.all()
     return render(request, "contact.html",{'contacts':contacts})
 
-@login_required(login_url='login')
+
 def about(request):   
     return render(request,"about.html")
-@login_required(login_url='login')
+
 def service(request):   
     return render(request,"service.html")
-@login_required(login_url='login')
+
 def update_contact(request,id):
     contact = Contact.objects.get(id=id)   
     if request.method == "POST":
@@ -94,6 +92,46 @@ def delete_contact(request, id):
     contact.delete()
     messages.success(request, f"{contact.name}'s record was deleted successfully.")
     return redirect('contact')
+@login_required(login_url='login')
 def logoutuser(request):
     logout(request)
     return redirect("login")
+@login_required
+def add_icecream(request):
+    if request.method == 'POST':
+        form = IcecreamForm(request.POST, request.FILES)
+        if form.is_valid():
+            icecream = form.save(commit=False)
+            icecream.added_by = request.user
+            icecream.save()
+            
+            BlogPost.objects.create(
+            title=icecream.name,
+            body=icecream.description,
+            image=icecream.image,
+            author=request.user
+                    )
+            return redirect('home')
+    else:
+        form = IcecreamForm()
+    return render(request, 'add_icecream.html', {'form': form})
+def icecream_detail(request, id):
+    icecream = get_object_or_404(Icecream, id=id)
+    return render(request, 'icecream_detail.html', {'icecream': icecream})
+
+def icecream_edit(request, id):
+    icecream = get_object_or_404(Icecream, id=id)
+    if request.method == 'POST':
+        form = IcecreamForm(request.POST, request.FILES, instance=icecream)
+        if form.is_valid():
+            form.save()
+            return redirect('icecream_detail', id=icecream.id)
+    else:
+        form = IcecreamForm(instance=icecream)
+    return render(request, 'icecream_edit.html', {'form': form, 'icecream': icecream})
+@login_required
+def icecream_delete(request, id):
+    icecream = get_object_or_404(Icecream, id=id)
+    icecream.delete()
+    return redirect('home')
+    

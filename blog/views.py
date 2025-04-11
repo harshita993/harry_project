@@ -2,10 +2,17 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import BlogPost
 from .forms import BlogPostForm
 from django.contrib.auth.decorators import login_required
-
+from django.db.models import Q
 def blog_list(request):
-    posts = BlogPost.objects.all().order_by('-created_at')
-    return render(request, 'blog_list.html', {'posts': posts})
+    query = request.GET.get('q')
+    if query:
+        posts = BlogPost.objects.filter(
+            Q(title__icontains=query) |
+            Q(body__icontains=query)
+        ).order_by('-created_at')
+    else:
+        posts = BlogPost.objects.all().order_by('-created_at')
+    return render(request, 'blog_list.html', {'posts': posts, 'query': query})
 
 def blog_detail(request, pk):
     post = get_object_or_404(BlogPost, pk=pk)

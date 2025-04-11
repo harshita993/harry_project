@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container text-center my-4">
+  <h2>{{ icecream.name }}</h2>
+  <img src="{{ icecream.image.url }}" class="img-fluid my-3" style="max-height: 300px;">
+  <p class="lead">{{ icecream.description }}</p>
+  <h4>Price: ₹{{ icecream.price }}</h4>
+</div>
+{% endblock %}

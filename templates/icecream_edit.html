@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-4">
+  <h2>Edit Icecream: {{ icecream.name }}</h2>
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Save</button>
+    <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
+    <a href="{% url 'icecream_delete' id=icecream.id %}" class="btn btn-danger mt-2">Delete</a>
+  </form>
+  
+</div>
+{% endblock %}
