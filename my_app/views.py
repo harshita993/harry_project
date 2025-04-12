@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .forms import IcecreamForm
+from django.core.paginator import Paginator
 def register_view(request):
     if request.method == 'POST':
         username = request.POST.get("username")
@@ -43,7 +44,10 @@ def login_view(request):
     return render(request,'login.html')
 
 def index(request):
-    icecreams = Icecream.objects.all()
+    icecream_list = Icecream.objects.all()
+    paginator = Paginator(icecream_list, 3) 
+    page_number = request.GET.get('page')
+    icecreams = paginator.get_page(page_number)
     if request.user.is_authenticated:
         messages.success(request, f"Welcome, {request.user.username}!")
     return render(request,"index.html",{'icecreams': icecreams})
@@ -58,8 +62,6 @@ def contact(request):
         contact = Contact(name = firstname,phone=phoneno,email=email,desc=desc,date=date)
         contact.save()
         messages.success(request,f"{contact.name} was successfully inserted")
-        
-        
         print(f"Received Contact Form: {firstname}, {phoneno}, {email}, {desc}")  
         return redirect("contact")  
     contacts = Contact.objects.all()
@@ -109,7 +111,8 @@ def add_icecream(request):
             title=icecream.name,
             body=icecream.description,
             image=icecream.image,
-            author=request.user
+            author=request.user,
+            icecream=icecream
                     )
             return redirect('home')
     else:
@@ -124,7 +127,25 @@ def icecream_edit(request, id):
     if request.method == 'POST':
         form = IcecreamForm(request.POST, request.FILES, instance=icecream)
         if form.is_valid():
-            form.save()
+            icecream = form.save(commit=False)
+            icecream.save() 
+
+            
+            try:
+                blog_post = BlogPost.objects.get(icecream=icecream)  
+                blog_post.title = icecream.name  
+                blog_post.body = icecream.description  
+                blog_post.image = icecream.image  
+                blog_post.save()  
+            except BlogPost.DoesNotExist:
+                
+                BlogPost.objects.create(
+                    title=icecream.name,
+                    body=icecream.description,
+                    image=icecream.image,
+                    author=request.user,
+                    icecream=icecream
+                )
             return redirect('icecream_detail', id=icecream.id)
     else:
         form = IcecreamForm(instance=icecream)
@@ -132,6 +153,9 @@ def icecream_edit(request, id):
 @login_required
 def icecream_delete(request, id):
     icecream = get_object_or_404(Icecream, id=id)
+    blog_post = BlogPost.objects.filter(icecream=icecream).first()  # Using first to get the first match, if any
+    if blog_post:
+        blog_post.delete()
     icecream.delete()
     return redirect('home')
     

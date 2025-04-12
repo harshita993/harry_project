@@ -14,6 +14,6 @@ class Icecream(models.Model):
     description = models.TextField()
     image = models.ImageField(upload_to='icecream_images/', null=True, blank=True)
     price = models.DecimalField(max_digits=6, decimal_places=2)
-
+    added_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     def __str__(self):
         return self.name

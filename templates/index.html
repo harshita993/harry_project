@@ -69,7 +69,45 @@
       </div>
       {% endfor %}
       
-      </div>
+      
+    </div> <!-- This closes your row -->
+    <div class="d-flex justify-content-center my-4">
+      <nav aria-label="Page navigation">
+        <ul class="pagination">
+          {% if icecreams.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1">&laquo; First</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ icecreams.previous_page_number }}">Previous</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">First</span></li>
+            <li class="page-item disabled"><span class="page-link">Previous</span></li>
+          {% endif %}
+    
+          <li class="page-item active">
+            <span class="page-link">
+              Page {{ icecreams.number }} of {{ icecreams.paginator.num_pages }}
+            </span>
+          </li>
+    
+          {% if icecreams.has_next %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ icecreams.next_page_number }}">Next</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ icecreams.paginator.num_pages }}">Last &raquo;</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">Next</span></li>
+            <li class="page-item disabled"><span class="page-link">Last</span></li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    
+    
     </div>
   </div>
  {% endblock content %}
