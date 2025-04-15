@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Your Orders{% endblock title %}
+{% block content %}
+
+<h2>Your Order History</h2>
+
+{% if orders %}
+  {% for order in orders %}
+    <div class="card mb-3">
+      <div class="card-header">
+        <strong>Order ID:</strong> {{ order.id }} |
+        <strong>Total:</strong> ₹{{ order.total_amount }} |
+        <strong>Date:</strong> {{ order.created_at|date:"d M Y H:i" }}
+      </div>
+      <div class="card-body">
+        <p><strong>Address:</strong> {{ order.address }}</p>
+        <ul>
+          {% for item in order.orderitem_set.all %}
+            <li>
+                {{ item.icecream.name }} ({{ item.quantity }}) × ₹{{ item.price }} = ₹{{ item.total_price }}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <p>No orders yet.</p>
+{% endif %}
+
+{% endblock content %}

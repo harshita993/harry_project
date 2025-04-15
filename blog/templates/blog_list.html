@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
   <h2>All Blog Posts</h2>
-  {% if user.is_authenticated %}
+  {% if user.is_authenticated and user.is_staff %}
     <a href="{% url 'blog_create' %}">+ New Post</a>
   {% endif %}
   <ul>

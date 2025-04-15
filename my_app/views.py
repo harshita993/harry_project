@@ -1,6 +1,6 @@
 from django.shortcuts import render,HttpResponse,redirect, get_object_or_404
 from datetime import datetime
-from my_app.models import Contact, Icecream
+from my_app.models import Contact, Icecream,CartItem, OrderItem, Order
 from blog.models import BlogPost
 from django.contrib import messages
 from django.contrib.auth import authenticate,login,logout
@@ -14,6 +14,7 @@ def register_view(request):
         email = request.POST.get("email")
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
+        make_superuser = 'is_superuser' in request.POST
 
         if password != confirm_password:
             messages.error(request, "Passwords do not match!")
@@ -24,7 +25,11 @@ def register_view(request):
             return redirect('register')
 
         user = User.objects.create_user(username=username, email=email, password=password)
+        if make_superuser:
+            user.is_superuser = True
+            user.is_staff = True 
         user.save()
+       
         messages.success(request, "User registered successfully. You can now login.")
         return redirect('login')
 
@@ -42,7 +47,7 @@ def login_view(request):
             return redirect('login')
                  
     return render(request,'login.html')
-
+@login_required(login_url='login')
 def index(request):
     icecream_list = Icecream.objects.all()
     paginator = Paginator(icecream_list, 3) 
@@ -51,7 +56,7 @@ def index(request):
     if request.user.is_authenticated:
         messages.success(request, f"Welcome, {request.user.username}!")
     return render(request,"index.html",{'icecreams': icecreams})
-
+@login_required(login_url='login')
 def contact(request):
     if request.method == "POST":
         firstname = request.POST.get("name")
@@ -67,13 +72,13 @@ def contact(request):
     contacts = Contact.objects.all()
     return render(request, "contact.html",{'contacts':contacts})
 
-
+@login_required(login_url='login')
 def about(request):   
     return render(request,"about.html")
-
+@login_required(login_url='login')
 def service(request):   
     return render(request,"service.html")
-
+@login_required(login_url='login')
 def update_contact(request,id):
     contact = Contact.objects.get(id=id)   
     if request.method == "POST":
@@ -118,10 +123,11 @@ def add_icecream(request):
     else:
         form = IcecreamForm()
     return render(request, 'add_icecream.html', {'form': form})
+@login_required(login_url='login')
 def icecream_detail(request, id):
     icecream = get_object_or_404(Icecream, id=id)
     return render(request, 'icecream_detail.html', {'icecream': icecream})
-
+@login_required(login_url='login')
 def icecream_edit(request, id):
     icecream = get_object_or_404(Icecream, id=id)
     if request.method == 'POST':
@@ -158,4 +164,76 @@ def icecream_delete(request, id):
         blog_post.delete()
     icecream.delete()
     return redirect('home')
-    
+@login_required
+def add_to_cart(request, icecream_id):
+    icecream = Icecream.objects.get(id=icecream_id)
+    quantity = int(request.POST.get("quantity", 1))
+    cart_item, created = CartItem.objects.get_or_create(user=request.user, icecream=icecream)
+    if not created:
+        cart_item.quantity += 1
+    else:
+        cart_item.quantity = quantity
+    cart_item.save()
+    messages.success(request, f"{icecream.name} added to your cart!")
+    return redirect('view_cart')
+@login_required
+def view_cart(request):
+    cart_items = CartItem.objects.filter(user=request.user)
+    for item in cart_items:
+        item.subtotal = item.quantity * item.icecream.price
+
+    total = sum(item.subtotal for item in cart_items)
+    return render(request, 'view_cart.html', {'cart_items': cart_items, 'total': total})
+@login_required
+def checkout(request):
+    cart_items = CartItem.objects.filter(user=request.user)
+    if not cart_items.exists():
+        messages.warning(request, "Your cart is empty.")
+        return redirect('view_cart')
+
+    if request.method == 'GET':
+        total = sum(item.quantity * item.icecream.price for item in cart_items)
+        return render(request, 'checkout.html', {'cart_items': cart_items, 'total': total})
+
+    elif request.method == 'POST':
+        address = request.POST.get('address')
+        total_amount = sum(item.quantity * item.icecream.price for item in cart_items)
+
+        order = Order.objects.create(user=request.user, total_amount=total_amount, address=address)
+
+        for item in cart_items:
+            OrderItem.objects.create(
+                order=order,
+                icecream=item.icecream,
+                quantity=item.quantity,
+                price=item.icecream.price
+            )
+
+        cart_items.delete()
+        messages.success(request, f"Order placed successfully! Order ID: {order.id}")
+        return redirect('home')
+
+def remove_from_cart(request, item_id):
+    cart_item = CartItem.objects.get(id=item_id, user=request.user)
+    cart_item.delete()
+    messages.success(request, "Item removed from your cart.")
+    return redirect('view_cart')
+def update_cart_quantity(request, item_id):
+    cart_item = CartItem.objects.get(id=item_id, user=request.user)
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'increase':
+            cart_item.quantity += 1
+            cart_item.save()
+        elif action == 'decrease':
+            if cart_item.quantity > 1:
+                cart_item.quantity -= 1
+                cart_item.save()
+            else:
+                cart_item.delete() 
+        messages.success(request, "Cart updated successfully.")
+    return redirect('view_cart')
+@login_required
+def order_history(request):
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')  # latest first
+    return render(request, 'order_history.html', {'orders': orders})

@@ -17,3 +17,23 @@ class Icecream(models.Model):
     added_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     def __str__(self):
         return self.name
+    
+class CartItem(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    icecream = models.ForeignKey('Icecream', on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def subtotal(self):
+        return self.quantity * self.icecream.price 
+
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    address = models.TextField()
+    total_amount = models.FloatField()
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    icecream = models.ForeignKey('Icecream', on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    price = models.FloatField()
