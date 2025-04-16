@@ -579,7 +579,7 @@ pre code {
 .container-md,
 .container-sm,
 .container-xl {
-    width: 130%;
+    width: 110%;
     padding-right: 10px;
     padding-left: 15px;
     margin-right: auto;
@@ -606,7 +606,7 @@ pre code {
     .container-lg,
     .container-md,
     .container-sm {
-        max-width: 1060
+        max-width: 960
     }
 }
 
@@ -616,7 +616,7 @@ pre code {
     .container-md,
     .container-sm,
     .container-xl {
-        max-width: 1060px
+        max-width: 1140px
     }
 }
 

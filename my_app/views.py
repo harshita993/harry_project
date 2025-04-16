@@ -73,8 +73,10 @@ def contact(request):
     return render(request, "contact.html",{'contacts':contacts})
 
 @login_required(login_url='login')
-def about(request):   
-    return render(request,"about.html")
+def about(request): 
+    admin_users = User.objects.filter(is_superuser=True) 
+    print("Admins:", admin_users)
+    return render(request,"about.html", {'admin_users': admin_users})
 @login_required(login_url='login')
 def service(request):   
     return render(request,"service.html")
@@ -159,7 +161,7 @@ def icecream_edit(request, id):
 @login_required
 def icecream_delete(request, id):
     icecream = get_object_or_404(Icecream, id=id)
-    blog_post = BlogPost.objects.filter(icecream=icecream).first()  # Using first to get the first match, if any
+    blog_post = BlogPost.objects.filter(icecream=icecream).first() 
     if blog_post:
         blog_post.delete()
     icecream.delete()
@@ -206,7 +208,8 @@ def checkout(request):
                 order=order,
                 icecream=item.icecream,
                 quantity=item.quantity,
-                price=item.icecream.price
+                price=item.icecream.price,
+                
             )
 
         cart_items.delete()
@@ -235,5 +238,14 @@ def update_cart_quantity(request, item_id):
     return redirect('view_cart')
 @login_required
 def order_history(request):
-    orders = Order.objects.filter(user=request.user).order_by('-created_at')  # latest first
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')  
+    
     return render(request, 'order_history.html', {'orders': orders})
+@login_required
+def delete_order(request, order_id):
+    order = Order.objects.get(id=order_id, user=request.user)
+    if request.method == 'POST':
+        order.delete()
+        messages.success(request, "Order deleted successfully.")
+        return redirect('order_history')
+    return render(request, 'confirm_delete_order.html', {'order': order})

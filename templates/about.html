@@ -1,5 +1,33 @@
-{% extends "base.html" %}
- {% block title %}{% endblock title %}
- {% block content %}
- this is our body block
- {% endblock content %}
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>About Us</h2>
+    <p>Welcome to our ice cream shop! 🍦</p>
+    <p>We are passionate about delivering the best frozen treats made with love and the freshest ingredients. Whether you're craving classic flavors or creative new combinations, we've got something special for everyone!</p>
+
+    <h4>Our Mission</h4>
+    <p>To bring smiles through sweet delights, one scoop at a time.</p>
+
+    <h4>Contact Info</h4>
+    <ul>
+      <li>Email: support@icecreamshop.com</li>
+      <li>Phone: +91-1234567890</li>
+      <li>Address: Surat, Gujarat, India</li>
+    </ul>
+    <hr>
+
+    {% if admin_users %}
+      <h3>Meet Our Admins</h3>
+      {% for admin in admin_users %}
+        <div class="card mb-3 p-3 border rounded shadow-sm">
+          <p><strong>Username:</strong> {{ admin.username }}</p>
+          <p><strong>Email:</strong> {{ admin.email }}</p>
+          <p><strong>Date Joined:</strong> {{ admin.date_joined|date:"F j, Y" }}</p>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No admins found.</p>
+    {% endif %}
+  </div>
+{% endblock %}

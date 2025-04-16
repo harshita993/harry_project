@@ -37,3 +37,6 @@ class OrderItem(models.Model):
     icecream = models.ForeignKey('Icecream', on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     price = models.FloatField()
+    @property
+    def total_price(self):
+        return self.quantity * self.price
