@@ -28,14 +28,14 @@
                     <a class="nav-link" href='{% url "about" %}'> Aboutus</a>
                   </li>
                   <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href='{% url "service" %}' role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href='#' role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       Services
                     </a>
                     <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="#">Icecream</a></li>
-                      <li><a class="dropdown-item" href="#">Familypack</a></li>
-                      <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item" href="#">Softy</a></li>
+                      <li><a class="dropdown-item" href="{% url 'service' %}">All Services</a></li>
+                      {% for cat in categories %}
+                        <li><a class="dropdown-item" href="{% url 'services_by_category' category=cat %}">{{ cat }}</a></li>
+                      {% endfor %}
                     </ul>
                   </li>
                   <li class="nav-item">

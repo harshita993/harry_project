@@ -1,5 +1,56 @@
 {% extends "base.html" %}
- {% block title %}{% endblock title %}
- {% block content %}
- this is our body block
- {% endblock content %}
+{% block title %}Our Services{% endblock title %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Our Services</h1>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+
+        <div class="col">
+            <div class="card h-100 shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Home Delivery</h5>
+                    <p class="card-text">Enjoy our delicious ice creams delivered right to your doorstep. Fast, fresh, and frozen!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Party Orders</h5>
+                    <p class="card-text">Planning a party? We offer customized packages for birthdays, weddings, and corporate events.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Custom Flavors</h5>
+                    <p class="card-text">Create your own flavor! Choose from a variety of bases, mix-ins, and toppings to make something unique.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Franchise Opportunities</h5>
+                    <p class="card-text">Partner with us and bring our ice cream to your city! Contact us for franchise info.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Bulk Orders</h5>
+                    <p class="card-text">Need ice cream in bulk for a school or office event? We offer special pricing for large orders.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock content %}

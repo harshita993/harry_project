@@ -8,7 +8,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .forms import IcecreamForm
 from django.core.paginator import Paginator
+
+
+def get_categories():
+    return Icecream.objects.values_list('category', flat=True).distinct()
 def register_view(request):
+    
     if request.method == 'POST':
         username = request.POST.get("username")
         email = request.POST.get("email")
@@ -49,15 +54,18 @@ def login_view(request):
     return render(request,'login.html')
 @login_required(login_url='login')
 def index(request):
+    categories = get_categories()
     icecream_list = Icecream.objects.all()
     paginator = Paginator(icecream_list, 3) 
     page_number = request.GET.get('page')
     icecreams = paginator.get_page(page_number)
     if request.user.is_authenticated:
         messages.success(request, f"Welcome, {request.user.username}!")
-    return render(request,"index.html",{'icecreams': icecreams})
+    return render(request,"index.html",{'icecreams': icecreams,'categories': categories})
+
 @login_required(login_url='login')
 def contact(request):
+    categories = get_categories()
     if request.method == "POST":
         firstname = request.POST.get("name")
         phoneno = request.POST.get("phone")
@@ -70,16 +78,27 @@ def contact(request):
         print(f"Received Contact Form: {firstname}, {phoneno}, {email}, {desc}")  
         return redirect("contact")  
     contacts = Contact.objects.all()
-    return render(request, "contact.html",{'contacts':contacts})
+    return render(request, "contact.html",{'contacts':contacts, 'categories': categories})
 
 @login_required(login_url='login')
 def about(request): 
+    categories = get_categories()
     admin_users = User.objects.filter(is_superuser=True) 
     print("Admins:", admin_users)
-    return render(request,"about.html", {'admin_users': admin_users})
+    return render(request,"about.html", {'admin_users': admin_users,'categories': categories})
 @login_required(login_url='login')
 def service(request):   
-    return render(request,"service.html")
+    categories = get_categories()
+    return render(request,"service.html",{'categories': categories})
+def services_by_category(request, category):
+    items = Icecream.objects.filter(category=category)
+    categories = Icecream.objects.values_list('category', flat=True).distinct()
+    return render(request, 'category_service.html', {
+        'icecreams': items,
+        'categories': categories,
+        'selected_category': category
+    })
+
 @login_required(login_url='login')
 def update_contact(request,id):
     contact = Contact.objects.get(id=id)   
@@ -107,6 +126,7 @@ def logoutuser(request):
     return redirect("login")
 @login_required
 def add_icecream(request):
+    categories = get_categories()
     if request.method == 'POST':
         form = IcecreamForm(request.POST, request.FILES)
         if form.is_valid():
@@ -124,7 +144,7 @@ def add_icecream(request):
             return redirect('home')
     else:
         form = IcecreamForm()
-    return render(request, 'add_icecream.html', {'form': form})
+    return render(request, 'add_icecream.html', {'form': form, 'categories': categories})
 @login_required(login_url='login')
 def icecream_detail(request, id):
     icecream = get_object_or_404(Icecream, id=id)
@@ -154,7 +174,7 @@ def icecream_edit(request, id):
                     author=request.user,
                     icecream=icecream
                 )
-            return redirect('icecream_detail', id=icecream.id)
+            return redirect('home')
     else:
         form = IcecreamForm(instance=icecream)
     return render(request, 'icecream_edit.html', {'form': form, 'icecream': icecream})

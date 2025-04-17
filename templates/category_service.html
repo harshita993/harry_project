@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="container my-2">
+    <h2 class="text-center my-4">{{ selected_category }} Items</h2>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+      {% for icecream in icecreams %}
+      <div class="col">
+        <div class="card shadow-sm h-100">
+          <img src="{{ icecream.image.url }}" class="img-fluid" style="height: 240px; object-fit: cover;">
+          <div class="card-body">
+            <h5 class="card-title">{{ icecream.name }}</h5>
+            <p class="card-text">{{ icecream.description|truncatewords:25 }}</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <a href="{% url 'icecream_detail' id=icecream.id %}" class="btn btn-sm btn-outline-secondary">View</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}

@@ -22,6 +22,7 @@ urlpatterns = [
     path('cart/remove/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('cart/update/<int:item_id>/', views.update_cart_quantity, name='update_cart_quantity'),
     path('delete_order/<int:order_id>/', views.delete_order, name='delete_order'),
+    path('service/<str:category>/', views.services_by_category, name='services_by_category'),
     
 
 ]
